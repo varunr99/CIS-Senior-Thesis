@@ -1,3 +1,4 @@
+# Credit to David Heffernan for sample code - citation also in main paper
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
@@ -18,38 +19,29 @@ lang = 'en'
 myUa = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.121 Safari/537.36'
 HEADER = {'User-Agent': myUa}
 
-
-i = 0
-
-def writeTweets(tweets, collection):
-    newTweetRecords = []
+def writeTweets(tweet_obj):
+    new_tweets = []
     for tweet in tweets:
         try:
             if tweet.find("a", {"class" : "js-action-profile-promoted"}):
                 continue
-
             text = tweet.find("p", {"class" : "tweet-text"}).get_text()
             date = tweet.find("span", {"class" : "_timestamp"})["data-time-ms"]
+            likes = tweet.find("div", {"class": "ProfileTweet-action--favorite"}).find("span", {"class" :  
+                                        "ProfileTweet-actionCountForPresentation"}).get_text()
+            replies = tweet.find("div", {"class": "ProfileTweet-action--reply"}).find("span", {"class" : \
+                "ProfileTweet-actionCountForPresentation"}).get_text()
+            retweets = tweet.find("div", {"class": "ProfileTweet-action--retweet"}).find("span", {"class"       
+                                           :"ProfileTweet-actionCountForPresentation"}).get_text()
+            username = tweet.find("span", {"class" : username})
+            name =  tweet.find("span", {"class": fullname})
             tweetId = tweet['data-item-id']
-            replyCount = tweetMetadata(tweet, "ProfileTweet-action--reply")
-            retweetCount = tweetMetadata(tweet, "ProfileTweet-action--retweet")
-            favoriteCount = tweetMetadata(tweet, "ProfileTweet-action--favorite")
-            verified = False
-            if tweet.find("span", {"class" : "Icon--verified"}) != None:
-                verified = True
-            tweetRecord = {"text" : text, "date" : date, "tweetId" : tweetId,
-                           "replyCount": replyCount, "retweetCount": retweetCount,
-                           "favoriteCount": favoriteCount, "verified" : verified}
-            newTweetRecords.append(tweetRecord)
+            tweetRecord = {"text" : text, "date" : date, "tweetId" : tweetId, \
+                           "likes": likes, "replies": replies, "retweets": retweets, \
+                           "username": username, "name": name}
+            new_tweets.append(tweetRecord)
         except:
-            print("Unable to process tweet")
-        try:
-            result = collection.insert_many(newTweetRecords, ordered=False)
-            i += len(newTweetRecords)
-        except pymongo.errors.BulkWriteError as e:
-            panic = list(filter(lambda x: x['code'] != 11000, e.details['writeErrors']))
-            if len(panic) > 0:
-                print(e)
+                print("Unable to process tweet")
 
 
 def tweetMetadata(tweet, divClass):
@@ -80,8 +72,7 @@ def executeQuery(keywords, since, until, collection):
         try:
             json_resp = json.loads(response.text)
         except:
-            print("Unable to process json response")
-            print(response.text)
+            print("JSON PROCESSING ERROR")
             return
         html = json_resp['items_html']
         soup = BeautifulSoup(html, 'lxml')
@@ -93,13 +84,3 @@ def executeQuery(keywords, since, until, collection):
         if (not json_resp['has_more_items']) and (json_resp["new_latent_count"] == 0):
             break
         next_pointer = json_resp['min_position']
-
-
-if __name__ == '__main__':
-    client = MongoClient('mongodb://mongodb:27017', username='<username>', password='<password>', authSource='admin')
-    tweetCol = client['twitter']['tweets']
-    todoCol = client['twitter']['queriesTodo']
-    currentQuery = todoCol.find_one_and_delete({})
-    while currentQuery != None:
-        executeQuery(currentQuery["qWords"], currentQuery["since"], currentQuery["until"], tweetCol)
-        currentQuery = todoCol.find_one_and_delete({})
