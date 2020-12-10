@@ -1,8 +1,8 @@
 # CIS-Senior-Thesis
 
-Topic: An Exploration of Alternative Data Signals for Implied Volatility in Cryptocurrency Options
-Authors: Varun Ramakrishnan, Ahmed Lone
-Advisor: Dr. Swapneel Sheth
+Topic: An Exploration of Alternative Data Signals for Implied Volatility in Cryptocurrency Options \
+Authors: Varun Ramakrishnan, Ahmed Lone \
+Advisor: Dr. Swapneel Sheth \
 Abstract: This paper seeks to explore the presence of alternative data signals for implied volatility in cryptocurrency options. Featuring a fairly broad set of techniques to investigate this relationship, this paper will break down the process of procuring the fairly sparse and often erroneous data necessary to quantify the relevant factors in our inquiry, processing the data into more interpretable and relevant information, analyzing the data for a relationship, and further investigating the features of this relationship. The broad spectrum of project work involved in creating the insight provided in this paper also involved a fairly diverse spectrum of more specific topics, with much of the procured data requiring web scraping, more complex sentiment analysis, and the creation of autonomous systems to search existing data warehouses for desired material. Much of the analysis required not only an understanding of statistical techniques in relating time-series data, but also an understanding of the underlying financial theory behind the investigated products. Finally, this paper goes on to highlight both the direct implications of the completed project and the business applications and considerations that motivated this work to begin with. With an emphasis on applicability and generating a new, unique and real insight into a fairly complex relationship despite the associated difficulties in analysis, this paper aims to directly contribute to the growing intersection between financial markets and computer science.  
 
 All code from the procedure can be found here. All datasets, except for tweets.csv, are also here. 
